@@ -1,9 +1,12 @@
 import express, { Request, Response, ErrorRequestHandler } from 'express';
-import path from 'path';
+//import path from 'path';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import apiRoutes from './routes/api';
 import bodyParser from 'body-parser';
+
+const path = require('path');
+
 
 dotenv.config();
 
@@ -11,7 +14,9 @@ const server = express();
 
 server.use(cors());
 
-server.use(bodyParser.json())
+server.use(bodyParser.json());
+
+server.use('/files', express.static(`${process.env.PUBLIC_FOLDER}`));
 
 server.use(express.static(path.join(__dirname, '../public')));
 server.use(express.urlencoded({ extended: true }));
