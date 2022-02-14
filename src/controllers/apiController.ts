@@ -2,6 +2,9 @@ import { Request, Response } from 'express';
 import { Technique, TechniqueInstance } from '../models/Technique';
 import { User } from '../models/User';
 import {generateToken} from '../config/passport'
+import sharp from 'sharp';
+
+import {unlink} from 'fs/promises';
 
 export const ping = (req: Request, res: Response) => {
     res.json({pong: true});
@@ -60,18 +63,83 @@ export const list = async (req: Request, res: Response) => {
 }
 
 export const addTechnique = async (req: Request, res: Response) => {
-  console.log(req.body);
-  const {title, body, link, reference, url_image, name_image} = req.body;
+  console.log('Req body: ', req.body);
+  console.log('Req file: ', req.file); 
+  
+  let {title, body, link, reference, url_image, name_image} = req.body;
+
+  type Resul = {
+    image?: string,
+    image_error?: string,
+  }
+
+  let result: Resul = {}
+
+  if (req.file) {  
+    const filename = `${req.file.filename}.jpg`
+    await sharp(req.file.path)
+      .resize(300, 300, {
+        fit: sharp.fit.cover, //fill=> distorce  cover=> corta
+        position: 'top'
+      })
+      .toFormat('jpeg')
+      .toFile(`./public/media/${filename}`)    //or .buffer se tiver na mem
+    
+    await unlink(req.file.path);
+    name_image = `${filename}`
+
+    result.image = `${filename}`;
+
+    //res.json({image: `${filename}`});
+  } else {
+    result.image_error = 'Arquivo inválido.'
+    //res.status(404).json({ error: 'Arquivo inválido.'})
+  }
+  
   let newTech = await Technique.create({title, body, link, reference, url_image, name_image});
 
   console.log("NEW TEch: ", newTech);
   if (newTech) {
     res.status(201);
-    res.json({error: '', id: newTech.id});     
+    res.json({error: '', id: newTech.id, result});     
   } else {
     res.status(401);
-    res.json({error: "Error creating new technique."});     
+    res.json({error: "Error creating new technique.", result});     
   }
   
 }
+
+export const uploadFile = async (req: Request, res: Response) => {
+    //Permite qualquer string para fieldname
+    //const files = req.files as { [fieldname: string]: Express.Multer.File[]};
+  
+    // type UploadTypes = {
+    //   avatar: Express.Multer.File[],
+    //   gallery: Express.Multer.File[]
+    // }
+    // const files = req.files as UploadTypes
+  
+    
+    if (req.file) {
+  
+      const filename = `${req.file.filename}.jpg`
+  
+      await sharp(req.file.path)
+        .resize(300, 300, {
+          fit: sharp.fit.cover, //fill=> distorce  cover=> corta
+          position: 'top'
+        })
+        .toFormat('jpeg')
+        .toFile(`./public/media/${filename}`)    //or .buffer se tiver na mem
+      
+      await unlink(req.file.path);
+  
+      res.json({image: `${filename}`});
+    } else {
+      res.status(404).json({ error: 'Arquivo inválido.'})
+    }
+    console.log("Arquivo: ", req.file);
+    console.log("Arquivos: ", req.files);   
+  
+  }
 
