@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start-dev": "nodemon -e ts,json src/server.ts",
-    "start": "node src/server.ts"
+    "start": "ts-node src/server.ts"
   },
   "type": "module",
   "author": "",
@@ -26,6 +26,7 @@
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.6.5",
     "sharp": "^0.30.1",
+    "ts-node": "^10.5.0",
     "validator": "^13.6.0"
   },
   "devDependencies": {
