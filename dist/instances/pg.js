@@ -17,9 +17,23 @@ dotenv_1.default.config();
 //         }
 //     }
 // });
-exports.sequelize = new sequelize_1.Sequelize(process.env.PG_DB, process.env.PG_USER, process.env.PG_PASSWORD, {
-    host: process.env.PG_HOST,
+// export const sequelize = new Sequelize(
+//     process.env.PG_DB as string,
+//     process.env.PG_USER as string,
+//     process.env.PG_PASSWORD as string,
+//     {
+//         host: process.env.PG_HOST as string,
+//         dialect: 'postgres',
+//         port: parseInt(process.env.PG_PORT as string)
+//     }
+// );
+exports.sequelize = new sequelize_1.Sequelize(process.env.DATABASE_URL, {
     dialect: 'postgres',
-    port: parseInt(process.env.PG_PORT)
+    protocol: 'postgres',
+    dialectOptions: {
+        ssl: {
+            require: true,
+            rejectUnauthorized: false
+        }
+    }
 });
-//export const sequelize = new Sequelize(process.env.DATABASE_URL as string);
