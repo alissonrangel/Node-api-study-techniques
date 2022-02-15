@@ -1,11 +1,9 @@
 import express, { Request, Response, ErrorRequestHandler } from 'express';
-//import path from 'path';
+import path from 'path';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import apiRoutes from './routes/api';
 import bodyParser from 'body-parser';
-
-const path = require('path');
 
 
 dotenv.config();
