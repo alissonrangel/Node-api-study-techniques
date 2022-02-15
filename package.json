@@ -8,6 +8,7 @@
     "start-dev": "nodemon -e ts,json src/server.ts",
     "start": "node src/server.ts"
   },
+  "type": "module",
   "author": "",
   "license": "ISC",
   "dependencies": {
