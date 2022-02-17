@@ -11,7 +11,7 @@ export interface TechniqueInstance extends Model {
     name_image: string;
 }
 
-export const Technique = sequelize.define<TechniqueInstance>('Technique', {
+const Technique = sequelize.define<TechniqueInstance>('Technique', {
     id: {
         primaryKey: true,
         autoIncrement: true,
@@ -40,3 +40,39 @@ export const Technique = sequelize.define<TechniqueInstance>('Technique', {
     tableName: 'techniques',
     timestamps: false
 });
+
+export interface CommentInstance extends Model {
+    id: number;
+    body: string;
+    TechniqueId: number;
+}
+
+const Comment = sequelize.define<CommentInstance>('Comment', {
+    id: {
+        primaryKey: true,
+        autoIncrement: true,
+        type: DataTypes.INTEGER
+    },    
+    body: {
+        type: DataTypes.STRING
+    },        
+    TechniqueId: { 
+        type: DataTypes.INTEGER,
+        references: {
+          model: Technique,
+          key: 'id'
+        }
+    }
+}, {
+    tableName: 'comments',
+    timestamps: false
+});
+
+Technique.hasMany(Comment)
+
+Comment.belongsTo(Technique);
+
+export default {
+    Comment,
+    Technique
+}

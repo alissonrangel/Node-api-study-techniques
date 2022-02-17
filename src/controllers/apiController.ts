@@ -1,10 +1,12 @@
 import { Request, Response } from 'express';
-import { Technique, TechniqueInstance } from '../models/Technique';
+import Models, { TechniqueInstance, CommentInstance } from '../models/Technique';
 import { User } from '../models/User';
+//import Comment, {CommentInstance} from '../models/Comment';
 import {generateToken} from '../config/passport'
 import sharp from 'sharp';
 
 import {unlink} from 'fs/promises';
+import Technique from '../models/Technique';
 
 export const ping = (req: Request, res: Response) => {
     res.json({pong: true});
@@ -52,7 +54,7 @@ export const loginWithJWT = async (req: Request, res: Response) => {
 
 
 export const list = async (req: Request, res: Response) => {
-    let techs = await Technique.findAll();
+    let techs = await Models.Technique.findAll();
     let list: TechniqueInstance[] = [];
 
     for(let i in techs) {
@@ -96,7 +98,7 @@ export const addTechnique = async (req: Request, res: Response) => {
     //res.status(404).json({ error: 'Arquivo inválido.'})
   }
   
-  let newTech = await Technique.create({title, body, link, reference, url_image, name_image});
+  let newTech = await Models.Technique.create({title, body, link, reference, url_image, name_image});
 
   console.log("NEW TEch: ", newTech);
   if (newTech) {
@@ -107,6 +109,41 @@ export const addTechnique = async (req: Request, res: Response) => {
     res.json({error: "Error creating new technique.", result});     
   }
   
+}
+
+export const addComment = async (req: Request, res: Response) => {
+  console.log('Req body: ', req.body);
+  
+  let { body, TechniqueId } = req.body;  
+  
+  let newComment = await Models.Comment.create({body, TechniqueId});
+
+  console.log("NEW Comment: ", newComment);
+  if (newComment) {
+    res.status(201);
+    res.json({error: '', id: newComment.id, newComment});     
+  } else {
+    res.status(401);
+    res.json({error: "Error creating new comment."});     
+  }
+}
+
+export const listCommnetsByTechnique = async (req: Request, res: Response) => {
+    
+    let tech_id = req.params.id;
+
+    let comments = await Models.Comment.findAll({
+      where: {
+        TechniqueId: tech_id
+      }
+    });
+    let list: CommentInstance[] = [];
+
+    for(let i in comments) {
+        list.push( comments[i] );
+    }
+
+    res.json({ list });
 }
 
 export const uploadFile = async (req: Request, res: Response) => {
