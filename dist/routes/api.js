@@ -37,9 +37,11 @@ const upload = (0, multer_1.default)({
 });
 const router = (0, express_1.Router)();
 router.get('/list', ApiController.list);
+router.get('/listCommnetsByTechnique/:id', ApiController.listCommnetsByTechnique);
 router.post('/register', ApiController.registerWithJWT);
 router.post('/login', ApiController.loginWithJWT);
 router.post('/techniques', upload.single('file'), ApiController.addTechnique);
+router.post('/comments', ApiController.addComment);
 //router.post('/techniques', privateRouteJWT, ApiController.addTechnique);
 //router.post('/upload', upload.single('avatar'), ApiController.uploadFile);
 exports.default = router;

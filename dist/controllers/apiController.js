@@ -12,9 +12,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.uploadFile = exports.addTechnique = exports.list = exports.loginWithJWT = exports.registerWithJWT = exports.ping = void 0;
-const Technique_1 = require("../models/Technique");
+exports.uploadFile = exports.listCommnetsByTechnique = exports.addComment = exports.addTechnique = exports.list = exports.loginWithJWT = exports.registerWithJWT = exports.ping = void 0;
+const Technique_1 = __importDefault(require("../models/Technique"));
 const User_1 = require("../models/User");
+//import Comment, {CommentInstance} from '../models/Comment';
 const passport_1 = require("../config/passport");
 const sharp_1 = __importDefault(require("sharp"));
 const promises_1 = require("fs/promises");
@@ -56,7 +57,7 @@ const loginWithJWT = (req, res) => __awaiter(void 0, void 0, void 0, function* (
 });
 exports.loginWithJWT = loginWithJWT;
 const list = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let techs = yield Technique_1.Technique.findAll();
+    let techs = yield Technique_1.default.Technique.findAll();
     let list = [];
     for (let i in techs) {
         list.push(techs[i]);
@@ -87,7 +88,7 @@ const addTechnique = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         result.image_error = 'Arquivo inválido.';
         //res.status(404).json({ error: 'Arquivo inválido.'})
     }
-    let newTech = yield Technique_1.Technique.create({ title, body, link, reference, url_image, name_image });
+    let newTech = yield Technique_1.default.Technique.create({ title, body, link, reference, url_image, name_image });
     console.log("NEW TEch: ", newTech);
     if (newTech) {
         res.status(201);
@@ -99,6 +100,35 @@ const addTechnique = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
 });
 exports.addTechnique = addTechnique;
+const addComment = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log('Req body: ', req.body);
+    let { body, TechniqueId } = req.body;
+    let newComment = yield Technique_1.default.Comment.create({ body, TechniqueId });
+    console.log("NEW Comment: ", newComment);
+    if (newComment) {
+        res.status(201);
+        res.json({ error: '', id: newComment.id, newComment });
+    }
+    else {
+        res.status(401);
+        res.json({ error: "Error creating new comment." });
+    }
+});
+exports.addComment = addComment;
+const listCommnetsByTechnique = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let tech_id = req.params.id;
+    let comments = yield Technique_1.default.Comment.findAll({
+        where: {
+            TechniqueId: tech_id
+        }
+    });
+    let list = [];
+    for (let i in comments) {
+        list.push(comments[i]);
+    }
+    res.json({ list });
+});
+exports.listCommnetsByTechnique = listCommnetsByTechnique;
 const uploadFile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     //Permite qualquer string para fieldname
     //const files = req.files as { [fieldname: string]: Express.Multer.File[]};

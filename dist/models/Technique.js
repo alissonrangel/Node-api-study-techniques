@@ -1,9 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Technique = void 0;
 const sequelize_1 = require("sequelize");
 const pg_1 = require("../instances/pg");
-exports.Technique = pg_1.sequelize.define('Technique', {
+const Technique = pg_1.sequelize.define('Technique', {
     id: {
         primaryKey: true,
         autoIncrement: true,
@@ -32,3 +31,29 @@ exports.Technique = pg_1.sequelize.define('Technique', {
     tableName: 'techniques',
     timestamps: false
 });
+const Comment = pg_1.sequelize.define('Comment', {
+    id: {
+        primaryKey: true,
+        autoIncrement: true,
+        type: sequelize_1.DataTypes.INTEGER
+    },
+    body: {
+        type: sequelize_1.DataTypes.STRING
+    },
+    TechniqueId: {
+        type: sequelize_1.DataTypes.INTEGER,
+        references: {
+            model: Technique,
+            key: 'id'
+        }
+    }
+}, {
+    tableName: 'comments',
+    timestamps: false
+});
+Technique.hasMany(Comment);
+Comment.belongsTo(Technique);
+exports.default = {
+    Comment,
+    Technique
+};
